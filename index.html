@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Подготовка к экзамену по немецкому — слова, тексты, тесты." />
+  <meta name="theme-color" content="#09090b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Deutsch Lernen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" ondragstart="return false">
+<script>
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && ['c','u','s','a'].includes(e.key.toLowerCase())) e.preventDefault();
+  if (e.key === 'F12') e.preventDefault();
+});
+</script>
+
+<!-- ========== HEADER ========== -->
+<header class="app-header">
+  <div class="header-left">
+    <div class="header-logo">
+      <img src="logo.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
+    </div>
+    <div>
+      <h1>Deutsch Lernen</h1>
+      <div class="subtitle">Подготовка к экзамену</div>
+    </div>
+  </div>
+  <div class="header-badge" id="headerBadge">Слова</div>
+</header>
+
+<!-- ========== MAIN ========== -->
+<main>
+
+  <!-- ===== СЛОВА ===== -->
+  <section class="section active" id="sec-words">
+    <div class="section-header">
+      <h2>Словарь</h2>
+      <p>Нажмите на карточку для подробностей</p>
+    </div>
+    <div class="filter-tabs" id="wordsFilter">
+      <button class="filter-chip active" data-topic="all">Все</button>
+    </div>
+    <div id="wordsList"></div>
+  </section>
+
+  <!-- ===== ТЕКСТЫ ===== -->
+  <section class="section" id="sec-texts">
+    <div class="section-header">
+      <h2>Тексты</h2>
+      <p>Полный текст · Краткий · Перевод</p>
+    </div>
+    <div class="filter-tabs" id="textsFilter">
+      <button class="filter-chip active" data-topic="all">Все тексты</button>
+    </div>
+    <div id="textsList"></div>
+  </section>
+
+  <!-- ===== ТЕСТ ===== -->
+  <section class="section" id="sec-quiz">
+    <div class="section-header">
+      <h2>Тест</h2>
+      <p>Проверь, сколько слов ты знаешь</p>
+    </div>
+
+    <!-- Setup -->
+    <div id="quizSetup">
+      <div class="quiz-options">
+        <div class="quiz-option-row">
+          <label>Режим</label>
+          <div class="custom-select" id="csQuizType" data-value="words">
+            <div class="custom-select-trigger">
+              <span>Слова</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-val="words">Слова</div>
+              <div class="custom-select-option" data-val="sentences">Предложения (тексты)</div>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row">
+          <label>Направление</label>
+          <div class="custom-select" id="csDir" data-value="de-ru">
+            <div class="custom-select-trigger">
+              <span>DE → RU</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-val="de-ru">DE → RU</div>
+              <div class="custom-select-option" data-val="ru-de">RU → DE</div>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row">
+          <label>Тема</label>
+          <div class="custom-select" id="csTopic" data-value="all">
+            <div class="custom-select-trigger">
+              <span>Все темы</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options" id="csTopicOptions">
+              <div class="custom-select-option selected" data-val="all">Все темы</div>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row">
+          <label>Кол-во вопросов</label>
+          <div class="custom-select" id="csCount" data-value="10">
+            <div class="custom-select-trigger">
+              <span>10</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options" id="csCountOptions">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row" id="rowUnknown">
+          <label>Только незнакомые</label>
+          <div class="custom-select" id="csUnknown" data-value="all">
+            <div class="custom-select-trigger">
+              <span>Нет, все</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-val="all">Нет, все</div>
+              <div class="custom-select-option" data-val="unknown">Только незнакомые</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" id="startQuizBtn">Начать тест</button>
+    </div>
+
+    <!-- Active Quiz -->
+    <div id="quizActive" class="quiz-active">
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="quizProgressFill"></div>
+      </div>
+      <div class="quiz-counter" id="quizCounter">1 / 10</div>
+      <div class="quiz-card">
+        <div class="quiz-question-label" id="quizLabel">Переведи на русский</div>
+        <div class="quiz-question-word" id="quizWord">—</div>
+      </div>
+      <div class="quiz-answers" id="quizAnswers"></div>
+    </div>
+
+    <!-- Results -->
+    <div id="quizResults" class="quiz-results">
+      <div class="results-icon">✓</div>
+      <div class="quiz-score" id="quizScoreNum">0%</div>
+      <div class="quiz-score-label">Результат</div>
+      <div class="score-breakdown">
+        <div class="score-item score-correct">
+          <div class="val" id="scoreCorrect">0</div>
+          <div class="lbl">Верно</div>
+        </div>
+        <div class="score-item score-wrong">
+          <div class="val" id="scoreWrong">0</div>
+          <div class="lbl">Ошибок</div>
+        </div>
+        <div class="score-item">
+          <div class="val" id="scoreTotal">0</div>
+          <div class="lbl">Всего</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" id="retryQuizBtn">Пройти ещё раз</button>
+      <button class="btn btn-ghost btn-block" id="resetQuizBtn" style="margin-top:8px">Настроить тест</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ========== BOTTOM NAV ========== -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-section="words" id="nav-words">
+    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>Слова</span>
+  </button>
+  <button class="nav-btn" data-section="texts" id="nav-texts">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>Тексты</span>
+  </button>
+  <button class="nav-btn" data-section="quiz" id="nav-quiz">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>Тест</span>
+  </button>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
