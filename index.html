@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Подготовка к экзамену по немецкому — слова, тексты, тесты." />
+  <meta name="theme-color" content="#09090b" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title></title>
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem('theme');
+        const theme = saved === 'light' || saved === 'dark'
+          ? saved
+          : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f6f6f4' : '#09090b';
+      } catch (_) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css?v=20260611-3" />
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" ondragstart="return false">
+<script>
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && ['c','u','s','a'].includes(e.key.toLowerCase())) e.preventDefault();
+  if (e.key === 'F12') e.preventDefault();
+});
+</script>
+
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Включить светлую тему" aria-pressed="false">
+  <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="3.5"/>
+    <path d="M12 2.5v2M12 19.5v2M4.5 12h-2M21.5 12h-2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/>
+  </svg>
+  <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M20 15.2A8.2 8.2 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2z"/>
+  </svg>
+</button>
+
+<!-- ========== MAIN ========== -->
+<main>
+
+  <!-- ===== СЛОВА ===== -->
+  <section class="section active" id="sec-words">
+    <div class="section-header">
+      <h2>Словарь</h2>
+      <p>Нажмите на карточку для подробностей</p>
+    </div>
+    <div class="dictionary-toolbar">
+      <div class="word-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="wordSearchInput" placeholder="Слово или перевод" autocomplete="off" spellcheck="false" />
+        <button class="search-clear-btn" id="wordSearchClear" type="button" aria-label="Очистить поиск">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+        </button>
+      </div>
+      <button class="favorites-filter-btn" id="favoritesFilterBtn" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.75 5.57 6.15.9-4.45 4.33 1.05 6.12L12 17.03l-5.5 2.89 1.05-6.12L3.1 9.47l6.15-.9L12 3z"/></svg>
+        <span>Избранное</span>
+        <span class="favorites-count" id="favoritesCount">0</span>
+      </button>
+    </div>
+    <div class="filter-tabs" id="wordsFilter">
+      <button class="filter-chip active" data-topic="all">Все</button>
+    </div>
+    <div id="wordsList"></div>
+  </section>
+
+  <!-- ===== ТЕКСТЫ ===== -->
+  <section class="section" id="sec-texts">
+    <div class="section-header">
+      <h2>Тексты</h2>
+      <p>Оригинальные темы и готовые адаптации про Абхазию</p>
+    </div>
+    <div class="texts-country-switch" id="textsCountrySwitch">
+      <button type="button" data-variant="original">Оригинал</button>
+      <button type="button" class="active" data-variant="abkhazia">Про Абхазию</button>
+    </div>
+    <div class="filter-tabs" id="textsFilter">
+      <button class="filter-chip active" data-topic="all">Все тексты</button>
+    </div>
+    <div id="textsList"></div>
+  </section>
+
+  <!-- ===== ТЕСТ ===== -->
+  <section class="section" id="sec-quiz">
+    <div class="section-header">
+      <h2>Тест</h2>
+      <p>Проверь, сколько слов ты знаешь</p>
+    </div>
+
+    <div class="text-map-shell">
+      <button class="text-map-toggle" id="textMapToggle" type="button" aria-expanded="false" aria-controls="textMapPanel">
+        <span class="text-map-toggle-copy">
+          <strong>Карта 8 оригинальных текстов</strong>
+          <small>Темы, персонажи, места, числа, маркеры и похожие предложения</small>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="text-map-panel" id="textMapPanel" hidden>
+        <div class="text-map-tip">
+          Сначала ищи уникальное имя, место или число. Если маркер общий, проверь действие и общий смысл предложения.
+        </div>
+        <div class="text-map-grid" id="textMapGrid"></div>
+      </div>
+    </div>
+
+    <div class="translation-prep-shell">
+      <button class="translation-prep-toggle" id="translationPrepToggle" type="button" aria-expanded="false" aria-controls="translationPrepPanel">
+        <span class="translation-prep-toggle-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M9 7h7M9 11h5"/></svg>
+        </span>
+        <span class="translation-prep-toggle-copy">
+          <strong>Подготовка к переводу</strong>
+          <small>Полезные слова и речевые блоки из выбранных текстов</small>
+        </span>
+        <svg class="translation-prep-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="translation-prep-panel" id="translationPrepPanel" hidden>
+        <div class="translation-prep-head">
+          <div class="translation-prep-tabs" role="tablist" aria-label="Материал для подготовки">
+            <button class="active" type="button" data-prep-tab="words" role="tab" aria-selected="true">Слова из текстов</button>
+            <button type="button" data-prep-tab="phrases" role="tab" aria-selected="false">Речевые блоки</button>
+          </div>
+          <div class="translation-prep-meta" id="translationPrepMeta"></div>
+        </div>
+        <div class="translation-prep-tip" id="translationPrepTip"></div>
+        <div class="translation-prep-grid" id="translationPrepGrid"></div>
+        <div class="translation-prep-actions">
+          <button class="btn btn-ghost" id="translationPrepRefresh" type="button">Другие карточки</button>
+          <button class="btn btn-primary" id="translationPrepBuilder" type="button">Перейти к конструктору</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Setup -->
+    <div id="quizSetup">
+      <div class="quiz-setup-card">
+        <div class="quiz-setup-intro">
+          <div class="quiz-setup-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div>
+            <strong>Настройка тренировки</strong>
+            <span>Выберите формат и сложность</span>
+          </div>
+        </div>
+        <div class="quiz-options">
+        <div class="quiz-option-row">
+          <label>Режим</label>
+          <div class="custom-select" id="csQuizType" data-value="words">
+            <div class="custom-select-trigger">
+              <span>Слова</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-val="words">Слова</div>
+              <div class="custom-select-option" data-val="sentences">Предложения (тексты)</div>
+              <div class="custom-select-option" data-val="builder">Конструктор предложений</div>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row" id="rowDirection">
+          <label>Направление</label>
+          <div class="custom-select" id="csDir" data-value="de-ru">
+            <div class="custom-select-trigger">
+              <span>DE → RU</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-val="de-ru">DE → RU</div>
+              <div class="custom-select-option" data-val="ru-de">RU → DE</div>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row">
+          <label>Тема</label>
+          <div class="custom-select topic-multi-select" id="csTopic" data-value="all" data-multiple="true">
+            <div class="custom-select-trigger">
+              <span>Все темы</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options" id="csTopicOptions">
+              <div class="custom-select-option selected" data-val="all"><span class="multi-check" aria-hidden="true"></span><span>Все темы</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row">
+          <label>Кол-во вопросов</label>
+          <div class="custom-select" id="csCount" data-value="10">
+            <div class="custom-select-trigger">
+              <span>10</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options" id="csCountOptions">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+        <div class="quiz-option-row" id="rowUnknown">
+          <label>Только незнакомые</label>
+          <div class="custom-select" id="csUnknown" data-value="all">
+            <div class="custom-select-trigger">
+              <span>Нет, все</span>
+              <svg viewBox="0 0 24 24" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-val="all">Нет, все</div>
+              <div class="custom-select-option" data-val="unknown">Только незнакомые</div>
+            </div>
+          </div>
+        </div>
+        </div>
+        <button class="btn btn-primary btn-block quiz-start-btn" id="startQuizBtn">
+          <span>Начать тест</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Quiz -->
+    <div id="quizActive" class="quiz-active">
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="quizProgressFill"></div>
+      </div>
+      <div class="quiz-counter" id="quizCounter">1 / 10</div>
+      <div class="quiz-card">
+        <div class="quiz-question-label" id="quizLabel">Переведи на русский</div>
+        <div class="quiz-question-word" id="quizWord">—</div>
+      </div>
+      <div class="quiz-answers" id="quizAnswers"></div>
+    </div>
+
+    <!-- Results -->
+    <div id="quizResults" class="quiz-results">
+      <div class="results-icon">✓</div>
+      <div class="quiz-score" id="quizScoreNum">0%</div>
+      <div class="quiz-score-label">Результат</div>
+      <div class="score-breakdown">
+        <div class="score-item score-correct">
+          <div class="val" id="scoreCorrect">0</div>
+          <div class="lbl">Верно</div>
+        </div>
+        <div class="score-item score-wrong">
+          <div class="val" id="scoreWrong">0</div>
+          <div class="lbl">Ошибок</div>
+        </div>
+        <div class="score-item">
+          <div class="val" id="scoreTotal">0</div>
+          <div class="lbl">Всего</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" id="retryQuizBtn">Пройти ещё раз</button>
+      <button class="btn btn-ghost btn-block" id="resetQuizBtn" style="margin-top:14px">Настроить тест</button>
+    </div>
+  </section>
+
+  <!-- ===== ЭКЗАМЕН ===== -->
+  <section class="section" id="sec-exam">
+    <div class="section-header">
+      <h2>Экзамен</h2>
+      <p>Слова и предложения из 3–4 лекций вперемешку</p>
+    </div>
+
+    <div id="examSetup">
+      <div class="exam-rules">
+        <div class="exam-rules-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div>
+          <strong>Строгий режим</strong>
+          <span>Одна попытка на каждый вопрос. После ошибки исправить ответ нельзя.</span>
+        </div>
+      </div>
+
+      <div class="exam-setup-card">
+        <div class="exam-setup-heading">
+          <strong>Выбери 3 или 4 лекции</strong>
+          <span id="examSelectionStatus">Выбрано: 0 из 4</span>
+        </div>
+        <div class="exam-topic-grid" id="examTopicGrid"></div>
+        <div class="exam-count-row">
+          <label for="examQuestionCount">Количество заданий</label>
+          <select id="examQuestionCount">
+            <option value="15">15 заданий</option>
+            <option value="20" selected>20 заданий</option>
+            <option value="25">25 заданий</option>
+          </select>
+        </div>
+        <div class="exam-composition">
+          <span><strong>40%</strong> слова RU → DE</span>
+          <span><strong>60%</strong> предложения RU → DE</span>
+        </div>
+        <button class="btn btn-primary btn-block exam-start-btn" id="startExamBtn" type="button">
+          Начать экзамен
+        </button>
+      </div>
+    </div>
+
+    <div class="exam-active" id="examActive">
+      <div class="exam-topline">
+        <span id="examQuestionType">Предложение</span>
+        <strong id="examCounter">1 / 20</strong>
+      </div>
+      <div class="exam-progress">
+        <div id="examProgressFill"></div>
+      </div>
+      <div class="exam-question-card">
+        <div class="exam-question-topic" id="examQuestionTopic"></div>
+        <div class="exam-question-prompt" id="examQuestionPrompt"></div>
+      </div>
+      <div class="exam-answer-area" id="examAnswerArea"></div>
+    </div>
+
+    <div class="exam-results" id="examResults">
+      <div class="exam-grade" id="examGrade">5</div>
+      <div class="exam-result-title" id="examResultTitle">Экзамен сдан</div>
+      <div class="exam-result-percent" id="examResultPercent">100%</div>
+      <div class="exam-result-summary" id="examResultSummary"></div>
+      <div class="exam-topic-results" id="examTopicResults"></div>
+      <div class="exam-errors-section" id="examErrorsSection">
+        <div class="exam-errors-heading">Ошибки</div>
+        <div class="exam-errors-list" id="examErrorsList"></div>
+      </div>
+      <button class="btn btn-primary btn-block" id="retryExamBtn" type="button">Пройти ещё раз</button>
+      <button class="btn btn-ghost btn-block" id="resetExamBtn" type="button">Выбрать другие лекции</button>
+    </div>
+  </section>
+
+  <!-- ===== РЕЙТИНГ ===== -->
+  <section class="section" id="sec-leaderboard">
+    <div class="section-header">
+      <h2>Рейтинг</h2>
+      <p>Активность участников и ваша позиция</p>
+    </div>
+    <div class="leaderboard-privacy" id="leaderboardPrivacy">
+      <div class="privacy-heading">
+        <div>
+          <strong>Приватность</strong>
+          <span>Вы останетесь в рейтинге, даже если скроете данные</span>
+        </div>
+        <span class="privacy-sync" id="privacySyncStatus">Сохранено</span>
+      </div>
+      <label class="privacy-option">
+        <span>
+          <strong>Скрыть ник</strong>
+          <small>Другие увидят «Анонимный участник»</small>
+        </span>
+        <input type="checkbox" id="hideNicknameToggle" />
+        <span class="privacy-switch" aria-hidden="true"></span>
+      </label>
+      <label class="privacy-option">
+        <span>
+          <strong>Скрыть точное время</strong>
+          <small>Позиция сохранится, время показываться не будет</small>
+        </span>
+        <input type="checkbox" id="hideTimeToggle" />
+        <span class="privacy-switch" aria-hidden="true"></span>
+      </label>
+    </div>
+    <div id="leaderboardList" class="leaderboard-list">
+       <!-- Populated by JS -->
+    </div>
+  </section>
+
+</main>
+
+<!-- ========== BOTTOM NAV ========== -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-section="words" id="nav-words">
+    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>Слова</span>
+  </button>
+  <button class="nav-btn" data-section="texts" id="nav-texts">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>Тексты</span>
+  </button>
+  <button class="nav-btn" data-section="quiz" id="nav-quiz">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>Тест</span>
+  </button>
+  <button class="nav-btn" data-section="exam" id="nav-exam">
+    <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3l1-2Z"/><path d="M9 12l2 2 4-4"/><path d="M9 18h6"/></svg>
+    <span>Экзамен</span>
+  </button>
+  <button class="nav-btn" data-section="leaderboard" id="nav-leaderboard">
+    <svg viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+    <span>Рейтинг</span>
+  </button>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Auth Modal -->
+<div class="auth-overlay show" id="authOverlay">
+  <div class="auth-modal">
+    <h2>Представьтесь</h2>
+    <p>Введите уникальный никнейм на английском языке для участия в рейтинге.</p>
+    <div class="auth-input-wrap">
+      <input type="text" id="nicknameInput" placeholder="Nickname..." autocomplete="off" maxlength="15" spellcheck="false" />
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <button class="btn btn-primary btn-block" id="authBtn">Войти</button>
+    <button class="btn btn-ghost btn-block auth-offline-btn" id="authOfflineBtn" type="button">Продолжить без рейтинга</button>
+  </div>
+</div>
+
+<script src="./data.js?v=20260611-3"></script>
+<script src="./abkhazia-data.js?v=20260611-3"></script>
+<script src="./script.js?v=20260611-3"></script>
+</body>
+</html>
